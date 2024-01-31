@@ -96,13 +96,14 @@ void push(stackPointer *, precedence);
 precedence pop(stackPointer *);
 void infixToPostfix();
 void infixToPrefix();
-int postEvaluation();
+void postEvaluation();
 void printToken(precedence);
 void insertDoubleList(char *);
 void printDoubleToken(precedence);
 void postfixToInfix();
 void infixPush();
 void prefixToInfix();
+void initialization();
 char * makeExpression(char*, char*, char*);
 char * makeFinalExpression(char*, char*, char*);
 
@@ -191,9 +192,7 @@ int insertExpression(char *expr, char *newexpr[])
 
     while (token != NULL)
     {
-        // fprintf(stdout, "%s\n", token);
         check = isValidExpression(token);
-        // fprintf(stdout, "%d\n", check);
 
         if (check == -1)
             return -1;
@@ -201,9 +200,6 @@ int insertExpression(char *expr, char *newexpr[])
         newexpr[n++] = strdup(token);
         token = strtok(NULL, delimiters);
     }
-    // for (int i=0; i<n; i++)
-    // fprintf(stdout, "%s", newexpr[i]);
-    // fprintf(stdout, "\n\n%d\n%d", strlen(newexpr), n);
     return 0;
 }
 /*수식이 올바르지 않을 경우 -1을 리턴하는 함수.
@@ -261,7 +257,7 @@ void evaluation()
         infixToPostfix(newexpr);
         fprintf(stdout, "prefix : possible \n");
         fprintf(stdout, "postfix : possible \n\n");
-        fprintf(stdout, "result : %d\n\n", calculation_result);
+        postEvaluation();
         return;
     }
     //맨 처음으로 들어온 값이 피연산자인지 연산자인지를 판단하여 중위, 전위, 후위수식을 구분한다.
@@ -289,8 +285,10 @@ void evaluation()
         prefix();
     else if (postfixNumber == 1)
         postfix();
+    // 맨 마지막에 최종 결과식을 출력한다. 
+    postEvaluation();
 }
-/*전위수식일 때*/
+/*전위수식일 때, 연산자가 하나만 들어올 경우에 대한 예외처리를 해줘야한다.*/
 void prefix()
 {
     int x=0;
@@ -304,10 +302,6 @@ void prefix()
     printf("\n");
     infixToPostfix(newPreInfixExpr);
     fprintf(stdout, "postfix : impossible\n\n\n");
-    if (calculation_result == -500)
-        fprintf(stdout, "result : Arithmetic error(cannot devide by zero)\n\n");
-    else
-        fprintf(stdout, "result : %d\n\n", calculation_result);
 }
 /*후위수식일 때*/
 void postfix()
@@ -320,11 +314,6 @@ void postfix()
     infixToPrefix(newPostInfixExpr);
     infixToPostfix(newPostInfixExpr);
     fprintf(stdout, "\n\n");
-    if (calculation_result == -500)
-        fprintf(stdout, "result : Arithmetic error(cannot devide by zero)\n\n");
-    else
-        fprintf(stdout, "result : %d\n\n", calculation_result);
-
 }
 /*중위수식일 때 */
 void infix()
@@ -339,11 +328,7 @@ void infix()
     infixToPrefix(newexpr);
     infixToPostfix(newexpr);
     fprintf(stdout, "prefix : impossible \n");
-    fprintf(stdout, "postfix : impossible \n\n\n");
-    if (calculation_result == -500)
-        fprintf(stdout, "result : Arithmetic error(cannot devide by zero)\n\n");
-    else
-        fprintf(stdout, "result : %d\n\n", calculation_result);
+    fprintf(stdout, "postfix : impossible \n\n");
 }
 /*중위수식을 전위수식으로 만들어주는 함수*/
 void infixToPrefix(char *newexpr[]) {
@@ -642,13 +627,14 @@ void infixToPostfix(char *newexpr[])
     }
     temp = infix_postfix;
     fprintf(stdout, "\n");
-    calculation_result = postEvaluation();
+    // postEvaluation();
+    // calculation_result = postEvaluation();
     //printf("계산 결과는 : %d ", calculation_result);
 }
 /*후위연산의 값을 계산하는 식
 -> 후위연산의 길이만큼 반복해서 값을 얻어온다. 혹은 NULL일 때까지 값을 얻어온다.
 연산자인 경우에는 숫자가 들어갈 수 있는 곳에 넣어준다.*/
-int postEvaluation() {
+void postEvaluation() {
     precedence token;
     char *symbol;
     int result=0;
@@ -674,8 +660,9 @@ int postEvaluation() {
                 case 4: evalPush(&eval, op1 * op2);
                     break;
                 case 5:
-                    if(op2 == 0)
-                         return -500;
+                    if(op2 == 0){
+                        fprintf(stdout, "result : Arithmetic error(cannot devide by zero)\n\n");
+                        return ;}
                     evalPush(&eval, op1 / op2);
                     break;
                 case 6: evalPush(&eval, op1 % op2);
@@ -685,9 +672,14 @@ int postEvaluation() {
         }
         temp = temp -> link;
     }
-    return evalPop(&eval);
+    printf("result : %d\n", evalPop(&eval));
 }
-
+/*필요한 함수들을 모두 초기화하는데 필요한 함수*/
+void initialization(){
+    top = NULL, infix_postfix = NULL, infix_prefix=NULL;
+    temp = NULL, top_result = NULL, eval = NULL;
+    prefixFormula = NULL, postfix_infix = NULL, prefix_infix = NULL;
+}
 // 명령형 인자로 전달을 받을 때와 그렇지 않을 때를 구분하여 따로 수식을 입력받는다.
 int main(int argc, char *argv[])
 {
@@ -707,9 +699,7 @@ int main(int argc, char *argv[])
     {
         while (1)
         {
-            top = NULL, infix_postfix = NULL, infix_prefix=NULL;
-            temp = NULL, top_result = NULL, eval = NULL;
-            prefixFormula = NULL, postfix_infix = NULL, prefix_infix = NULL;
+            initialization();
             //newexpr[0] = '\0';
             *newPreInfixExpr = NULL, *newPostInfixExpr = NULL;
             inputExpression();
