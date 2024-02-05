@@ -30,3 +30,4 @@ front = (front + 1) % MAX_QUEUE_SIZE
 
 * 동적 배열을 이용한 큐 (dynamicArrayQueue.c) 에서는 큐에서 마지막 원소를 비워두지 않고 전체를 다 채우고, 대신 구조체에 size와 capacity를 두어 큐가 꽉 찼는지 아닌지를 판별한다. 
 
+### 4. 연결 리스트를 이용한 큐
