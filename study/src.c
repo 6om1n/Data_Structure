@@ -1,16 +1,28 @@
 #include <stdio.h>
 #include <string.h>
 
-int main() {
-    char originalStr[100] = "world"; // 예제에서는 "world"로 초기화
-    char resultStr[100];
+#define MAX_QUEUE_SIZE 100
 
-    // 괄호 추가
-    strcpy(resultStr, "( ");
-    strcat(resultStr, originalStr);
+typedef struct {
+    int key;
+} element;
 
-    // 결과 출력
-    printf("Result: %s\n", resultStr);
+element queue[MAX_QUEUE_SIZE];
 
-    return 0;
+int rear = -1;
+int front = -1;
+
+void addQueue(element item) {
+    if (rear == MAX_QUEUE_SIZE -1)
+        queueFull();
+    queue[++rear] = item;
 }
+
+void deleteQueue(element item) {
+    if (front == rear)
+        return queueEmpty();
+    return queue[++front];
+}
+
+
+
