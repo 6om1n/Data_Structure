@@ -1,114 +1,79 @@
-/*백준 - 큐 -> 연결리스트로 구현해보자 */
+/* 백준 - 큐 -> 연결리스트로 구현해보자 
+-> 연결리스트로 구현했더니 문제가 둘 다 맞아서 이 문제는 다시 배열을 사용해서 구현해보기 (다시 풀기 !)*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct queueNode {
-    int item;
-    struct queueNode *link;
-} queueNode;
+#define MAX_QUEUE_SIZE 10001
 
-typedef struct queueType {
-    queueNode *front;
-    queueNode *rear;
-    int size;
-}queueType;
+int queue[MAX_QUEUE_SIZE];
 
-/*정수 x를 큐에 넣는 연산이다, 큐에 아무것도 없는 상태인지 아닌지를 판별해야함*/
-void push(queueType *q) {
+int front = -1;
+int rear = -1;
+int totalsize = 0;
+
+/*큐 배열에 값을 집어넣는 함수*/
+void push() {
     int item;
-    scanf("%d", &item); 
+    scanf("%d", &item);
     getchar();
-    queueNode *temp = (queueNode *)malloc(sizeof(queueNode));
-    temp -> item = item;
-    temp -> link = NULL;
-    /*아무런 값도 들어가지 않은 상태라면*/
-    if (q -> front == NULL) {
-        q -> front = temp;
-        q -> rear = temp;
-        q -> size = q -> size + 1;
-    }   
-    /*큐에 값이 하나라도 들어가있는 상태라면*/
-    else {
-        q -> rear -> link = temp;
-        q -> rear = temp;
-        q -> size = q -> size + 1;
-    }
+    queue[++rear] = item;
+    totalsize += 1;
 }
-/*큐에서 가장 앞에 있는 정수를 빼고, 그 수를 출력한다. */
-int pop(queueType *q) {
-    if (q -> front == NULL)
+/*큐에서 맨 앞의 값을 삭제하는 함수*/
+int pop() {
+    int item;
+    if (front == rear)
         return -1;
     else {
-        queueNode *temp = q -> front;
-        int item = temp -> item;
-        q -> front = q -> front -> link;
-        //하나밖에 없는 값을 삭제하는 경우
-        if (q -> front == NULL) {
-            q -> rear = NULL;
-        }
-        free(temp);
-        q -> size = q -> size -1;
+        totalsize -= 1;
+        item = queue[++front];
         return item;
     }
+    
 }
-int empty(queueType *q) {
-    if (q -> front == NULL)
+int size() {
+    return totalsize;
+}
+int empty(){
+    if (front == rear)
         return 1;
     else
         return 0;
 }
-int front(queueType *q) {
-    if (q -> front == NULL) {
-        return -1;
-    }
-    else {
-        return q -> front -> item;
-    }
-}   
-int back(queueType *q) {
-    if (q -> front == NULL)
+int getFront(){
+    if (front == rear)
         return -1;
     else {
-        return q -> rear -> item;
-    }
+    return queue[front+1];
+    }  
 }
-void init(queueType *q) {
-    q -> front = NULL;
-    q -> rear = NULL;
-    q -> size =0;
+int getBack(){
+    if (front == rear)
+        return -1;
+    else 
+        return queue[rear];
 }
-int size(queueType *q) {
-    return q -> size;
-}
+
 int main(int argc, char *argv[]) {
     int N;
-    char string[6]; //명령을 입력받을 변수
+    char string[6];
     scanf("%d", &N);
-    getchar(); //버퍼비워주기
-    queueType q;
-    init(&q);
-    //N개 만큼의 명령이 주어진다.
+    getchar();
     for (int i=0; i<N; i++) {
-        scanf("%s", string);
+        scanf("%s", &string);
         getchar();
-        if (strcmp(string, "push") == 0 ) {
-            push(&q); //push함수와 같은 것을 호출한다면 push 함수를 호출
-        }
-        else if (strcmp(string, "pop") == 0){
-            fprintf(stdout, "%d\n", pop(&q));
-        }
-        else if (strcmp(string, "empty") == 0) {
-            fprintf(stdout, "%d\n", empty(&q));
-        }
-        else if(strcmp(string, "front") == 0) {
-            fprintf(stdout, "%d\n", front(&q));
-        }
-        else if(strcmp(string, "back") == 0){
-            fprintf(stdout, "%d\n", back(&q));
-        }
-        else if(strcmp(string, "size") == 0){
-            fprintf(stdout, "%d\n", size(&q));
-        }
+        if (strcmp(string, "push") ==0)
+            push();
+        else if (strcmp(string, "pop") == 0)
+            fprintf(stdout, "%d\n", pop());
+        else if (strcmp(string, "size") == 0)
+            fprintf(stdout, "%d\n", size());
+        else if (strcmp(string, "empty") == 0)
+            fprintf(stdout, "%d\n", empty());
+        else if (strcmp(string, "front") == 0)
+            fprintf(stdout, "%d\n", getFront());
+        else if (strcmp(string, "back") ==0)
+            fprintf(stdout, "%d\n",getBack());
     }
 }
