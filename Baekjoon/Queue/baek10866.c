@@ -130,17 +130,18 @@ int back(dequeType *dq) {
     else
         return dq -> rear -> item;
 }
-void init(){
+void init(dequeType *dq) {
     dq -> front = NULL;
     dq -> rear = NULL;
     dq -> size = 0;
 }
+/*여기서 드는 의문점 : 왜 init() 이렇게 호출하면 정수만 입력하고 segmentation 오류가 날까?*/
 int main() {
     int N;
-    char string[12];
-    
+    char string[15];
     scanf("%d", &N);
     getchar();
+    init(&dq);
     for (int i=0; i<N; i++) {
         scanf("%s", string);
         getchar();
