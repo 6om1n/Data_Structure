@@ -1,22 +1,22 @@
 #include <stdio.h>
 #include <stdlib.h>
+
 #define MAX_ELEMENT 100
 
-//하나의 구조체 안에 heap을 만들고, 그 안에서 움직인다.  
-typedef struct{
+typedef struct {
     int heap[MAX_ELEMENT];
-    int heapSize;
-}heapType;
+    int heapSize; //현재 힘의 크기
+} heapType;
 
 heapType *createHeap();
 void push(heapType *h, int item);
 int pop(heapType *h);
 void printHeap(heapType *h);
 
-//모든건 heap 포인터에서 처리한다. 왜냐면, heap안에 heap이라는 배열과 길이가 들어있기 때문이다. 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
     int i, n, item;
-    heapType *heap = createHeap();
+    heapType *heap = createHeap(); //여기 구조체 안에서 힙을 관리한다.
+
     push(heap, 10);
     push(heap, 45);
     push(heap, 19);
@@ -24,54 +24,57 @@ int main(int argc, char* argv[]) {
     push(heap, 96);
 
     printHeap(heap);
-    n = heap->heapSize;
-    for (i=1; i<=n; i++){
+    n = heap -> heapSize;
+
+    for (i = 1; i<=n; i++) {
         item = pop(heap);
-        fprintf(stdout, " \n delete: [%d] ", item);
+        fprintf(stdout, " \n delete : [%d] ", item);
     }
     return 0;
 }
-heapType *createHeap(){
+heapType *createHeap() {
     heapType *h = (heapType *)malloc(sizeof(heapType));
-    h->heapSize=0;
+    h -> heapSize =0; //크기는 0으로 초기화한다.
     return h;
 }
-
 void push(heapType *h, int item) {
     int i;
-    h->heapSize = h->heapSize +1;
-    i = h->heapSize;
-    while ((i !=1) && (item > h->heap[i/2])) {
-        h ->heap[i] = h ->heap[i/2];
-        i /= 2;
+    h -> heapSize = h -> heapSize +1; // 루트 인덱스인 1부터 값을 집어넣는다.
+    i = h -> heapSize; //들어오려는 힙의 인덱스에 해당한다.
+    // 루트가 아닐 때까지 while문을 반복시킨다.
+    while ((i !=1) && item > h -> heap[i/2]) {
+        h->heap[i] = h->heap[i/2]; //부모의 값을 현재 자신의 위치에 대입을 시키고
+        i/=2; //자신의 위치는 부모의 위치로 올라간다.
     }
-    h->heap[i] = item;
+    h -> heap[i] = item;
 }
-/*삭제할 때, 맨 위의 값을 가지고, 맨 아래의 값을 임시 저장하고, 하나씩 비교하기*/
+
 int pop(heapType *h) {
     int parent, child;
     int item, temp;
-    item = h->heap[1]; //루트노드를 가리키게끔 
-    temp = h->heap[h->heapSize--]; //마지막 값을 반환하고 개수를 하나 줄여준다.
-    parent =1;
-    child = 2;
-    while (child <= h->heapSize)
-    {
-        if((child < h->heapSize) && (h->heap[child]) < h->heap[child+1])
-            child++;
+    item = h -> heap[1]; //루트 노드의 값을 item에 저장해놓는다
+    temp = h->heap[h->heapSize]; //마지막 노드의 값을 temp에 저장해놓는다
+    h -> heapSize = h -> heapSize -1; //최종적으로 하나의 값을 제외시킬 것이기 때문에 빼놓는다.
+    parent = 1; //처음에는 루트노드를 가리킨다.
+    child = 2; // 그 다음 루트노드의 왼쪽자식을 가리킨다.
+    
+    while (child <= h-> heapSize) {
+        if ((child < h-> heapSize) && (h-> heap[child]) <(h->heap[child+1]))
+            child++; //더 큰 값을 갖는 자식의 값으로 변경한다.
+        //temp가 맨 위에 루트의 자리에 있다고 생각을 하고, child보다 크다면 최대힙이 완성이 된 것이므로 함수를 종료시킨다.
         if (temp >= h->heap[child])
             break;
-        h->heap[parent] = h->heap[child];
+        h -> heap[parent] = h->heap[child];
         parent = child;
-        child *= 2;
+        child = child *2;
     }
-    h->heap[parent] = temp; //임시 저장한 마지막 값을 넣어줘야한다.
-    return item;
-}
-void printHeap(heapType *h){
-    fprintf(stdout, "Heap : ");
-    for (int i=1; i<= h->heapSize; i++)
-        fprintf(stdout, "[%d]  ", h->heap[i]);
+    h -> heap[parent] = temp;
+    return item; //어떤 값을 삭제하는지를 리턴해준다.
 }
 
-
+void printHeap(heapType *h) {
+    int i;
+    fprintf(stdout, " Heap : ");
+    for (i =1; i<=h->heapSize; i++)
+        fprintf(stdout, " [%d] ", h->heap[i]);
+}
