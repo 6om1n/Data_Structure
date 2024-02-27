@@ -57,9 +57,13 @@ int dequeue(priorityQueue* pq) {
         current = current -> right;
     }
     int maxItem =  current -> data;
+    //부모가 NULL이 아니라는 말은 가장 큰 값이 루트가 아니라는 말과 같다.
+    //가장 큰 값을 삭제하고, 그 값에 왼쪽에 달린 값을 부모의 오른쪽에 연결해준다. 
     if (parent != NULL) {
         parent-> right = current -> left;
     }
+    //부모가 NULL이라는 것은 가장 큰 값이 루트노드에 있다는 말이다.
+    //즉, 왼쪽 서브트리만 있을 경우이므로, 루트를 왼쪽 서브트리로 바꿔준다.  
     else {
         pq -> root = current -> left;
     }
